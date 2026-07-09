@@ -196,6 +196,10 @@ key_vault = {
 ./scripts/deploy.sh
 ```
 
+```powershell
+./scripts/deploy.ps1
+```
+
 Or manually:
 
 ```bash
@@ -212,6 +216,14 @@ terraform apply -var-file=terraform.tfvars
 
 # When keys are stored in Key Vault, pass one explicitly:
 ./scripts/test.sh --api-key "<subscription-key>"
+```
+
+```powershell
+# When use_target_key_vault = false, keys come from terraform output:
+./scripts/test.ps1
+
+# When keys are stored in Key Vault, pass one explicitly:
+./scripts/test.ps1 -ApiKey "<subscription-key>"
 ```
 
 You can also use the [`citadel-access-contracts-tests`](../validation/citadel-access-contracts-tests.ipynb) notebook to validate end-to-end connectivity of the newly created access contract.
@@ -594,13 +606,17 @@ The Terraform provider is pinned to `apim.subscription_id`. Key Vault and Foundr
 
 ## Scripts
 
+> Each script ships in two interchangeable flavours — Bash (`.sh`) and PowerShell (`.ps1`) — with identical functionality. Use whichever suits your shell.
+
 | Script | Purpose |
 |--------|---------|
-| `scripts/deploy.sh` | Init, import existing resources, plan, and apply. |
-| `scripts/import-existing.sh` | Import pre-existing APIM products/policies/subscriptions/API-links into state (idempotent re-runs). Called automatically by `deploy.sh`. |
-| `scripts/test.sh` | Smoke-test the onboarded services through the APIM gateway. |
+| `scripts/deploy.sh` / `scripts/deploy.ps1` | Init, import existing resources, plan, and apply. |
+| `scripts/import-existing.sh` / `scripts/import-existing.ps1` | Import pre-existing APIM products/policies/subscriptions/API-links into state (idempotent re-runs). Called automatically by the deploy script. |
+| `scripts/test.sh` / `scripts/test.ps1` | Smoke-test the onboarded services through the APIM gateway. |
 
 ### Deploy script options
+
+Bash (`deploy.sh`):
 
 ```
 --auto-approve    Skip interactive confirmation
@@ -609,13 +625,33 @@ The Terraform provider is pinned to `apim.subscription_id`. Key Vault and Foundr
 --var-file FILE   Custom .tfvars file (default: terraform.tfvars)
 ```
 
+PowerShell (`deploy.ps1`):
+
+```
+-AutoApprove      Skip interactive confirmation
+-PlanOnly         Show plan without applying
+-Destroy          Remove the onboarded use-case resources
+-VarFile FILE     Custom .tfvars file (default: terraform.tfvars)
+```
+
 ### Test script options
+
+Bash (`test.sh`):
 
 ```
 --api-key KEY       APIM subscription key (required when keys are in Key Vault)
 --gateway-url URL   Override the auto-detected gateway URL
 --path PATH         Probe a specific API path
 --verbose           Show response bodies
+```
+
+PowerShell (`test.ps1`):
+
+```
+-ApiKey KEY         APIM subscription key (required when keys are in Key Vault)
+-GatewayUrl URL     Override the auto-detected gateway URL
+-Path PATH          Probe a specific API path
+-Verbose            Show response bodies
 ```
 
 ## File structure
@@ -632,8 +668,11 @@ citadel-access-contracts/
 │   └── default-ai-product-policy.xml   # Default inbound product policy
 ├── scripts/
 │   ├── deploy.sh
+│   ├── deploy.ps1
 │   ├── import-existing.sh
-│   └── test.sh
+│   ├── import-existing.ps1
+│   ├── test.sh
+│   └── test.ps1
 └── README.md
 ```
 

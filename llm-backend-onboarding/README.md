@@ -93,6 +93,10 @@ llm_backend_config = [
 ./scripts/deploy.sh
 ```
 
+```powershell
+./scripts/deploy.ps1
+```
+
 Or manually:
 
 ```bash
@@ -105,6 +109,10 @@ terraform apply -var-file=terraform.tfvars
 
 ```bash
 ./scripts/test.sh --api-key "your-apim-subscription-key"
+```
+
+```powershell
+./scripts/test.ps1 -ApiKey "your-apim-subscription-key"
 ```
 
 ## Configuration Reference
@@ -622,13 +630,17 @@ This error means an `aws-bedrock` backend was matched but the AWS credentials na
 
 ## Scripts
 
+> Each script ships in two interchangeable flavours — Bash (`.sh`) and PowerShell (`.ps1`) — with identical functionality. Use whichever suits your shell.
+
 | Script | Purpose |
 |--------|---------|
-| `scripts/deploy.sh` | Initialize, plan, and apply Terraform |
-| `scripts/import-existing.sh` | Import pre-existing APIM resources into Terraform state |
-| `scripts/test.sh` | Test deployed backends via the APIM gateway |
+| `scripts/deploy.sh` / `scripts/deploy.ps1` | Initialize, plan, and apply Terraform |
+| `scripts/import-existing.sh` / `scripts/import-existing.ps1` | Import pre-existing APIM resources into Terraform state |
+| `scripts/test.sh` / `scripts/test.ps1` | Test deployed backends via the APIM gateway |
 
 ### Deploy Script Options
+
+Bash (`deploy.sh`):
 
 ```
 --auto-approve    Skip interactive confirmation
@@ -637,7 +649,18 @@ This error means an `aws-bedrock` backend was matched but the AWS credentials na
 --var-file FILE   Custom .tfvars file (default: terraform.tfvars)
 ```
 
+PowerShell (`deploy.ps1`):
+
+```
+-AutoApprove      Skip interactive confirmation
+-PlanOnly         Show plan without applying
+-Destroy          Remove all onboarded backends
+-VarFile FILE     Custom .tfvars file (default: terraform.tfvars)
+```
+
 ### Test Script Options
+
+Bash (`test.sh`):
 
 ```
 --api-key KEY       APIM subscription key (required)
@@ -645,6 +668,16 @@ This error means an `aws-bedrock` backend was matched but the AWS credentials na
 --model MODEL       Specific model to test
 --all-models        Test all configured models
 --verbose           Show full response bodies
+```
+
+PowerShell (`test.ps1`):
+
+```
+-ApiKey KEY         APIM subscription key (required)
+-GatewayUrl URL     Override auto-detected gateway URL
+-Model MODEL        Specific model to test
+-AllModels          Test all configured models
+-Verbose            Show full response bodies
 ```
 
 ## Outputs
@@ -686,9 +719,12 @@ llm-backend-onboarding/
 │   ├── universal-llm-openapi.json
 │   └── models-inference-openapi.json
 ├── scripts/
-│   ├── deploy.sh              # Deployment automation
-│   ├── import-existing.sh     # Import existing APIM resources
-│   └── test.sh                # Backend testing
+│   ├── deploy.sh              # Deployment automation (Bash)
+│   ├── deploy.ps1             # Deployment automation (PowerShell)
+│   ├── import-existing.sh     # Import existing APIM resources (Bash)
+│   ├── import-existing.ps1    # Import existing APIM resources (PowerShell)
+│   ├── test.sh                # Backend testing (Bash)
+│   └── test.ps1               # Backend testing (PowerShell)
 └── README.md
 ```
 
