@@ -17,6 +17,16 @@ variable "agent_subnet_prefix" { type = string }
 variable "apim_network_type" { type = string }
 variable "is_apim_vnet" { type = bool }
 variable "create_dns_zones" { type = bool }
+
+# When AMPLS (Azure Monitor Private Link Scope) is NOT enabled, the
+# privatelink.monitor.azure.com zone must NOT be linked to the VNet: an empty
+# linked zone hijacks and blackholes App Insights / Azure Monitor ingestion DNS
+# for every resource in the VNet (APIM gateway, Logic App, etc.), silently
+# breaking all Application Insights telemetry while Log Analytics keeps working.
+variable "use_azure_monitor_private_link_scope" {
+  type    = bool
+  default = false
+}
 variable "dns_zone_rg" { type = string }
 variable "dns_subscription_id" { type = string }
 variable "existing_private_dns_zones" { type = map(string) }

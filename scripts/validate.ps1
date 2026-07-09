@@ -96,7 +96,7 @@ Write-Host ''
 # =============================================================================
 Write-Info 'Test 1: Verifying resource group exists...'
 if ($RgName) {
-    $RgState = Invoke-AzRetry group show --name $RgName --query "properties.provisioningState" -o tsv
+    $RgState = Invoke-AzRetry group show --name $RgName --query "properties.provisioningState" --output tsv
     if ($RgState -eq 'Succeeded') {
         Write-Pass "Resource group '$RgName' exists (state: Succeeded)"
     }
@@ -113,7 +113,7 @@ else {
 # =============================================================================
 Write-Info 'Test 2: Verifying APIM service is online...'
 if ($ApimName -and $RgName) {
-    $ApimState = Invoke-AzRetry apim show --name $ApimName --resource-group $RgName --query "provisioningState" -o tsv
+    $ApimState = Invoke-AzRetry apim show --name $ApimName --resource-group $RgName --query "provisioningState" --output tsv
     if ($ApimState -eq 'Succeeded') {
         Write-Pass "APIM '$ApimName' is online (provisioningState: Succeeded)"
     }
@@ -158,7 +158,7 @@ else {
 # =============================================================================
 Write-Info 'Test 4: Verifying APIM APIs are deployed...'
 if ($ApimName -and $RgName) {
-    $ApiCount = (az apim api list --resource-group $RgName --service-name $ApimName --query "length(@)" -o tsv 2>$null)
+    $ApiCount = (az apim api list --resource-group $RgName --service-name $ApimName --query "length(@)" --output tsv 2>$null)
     if (-not $ApiCount) { $ApiCount = '0' }
 
     if ([int]$ApiCount -ge 2) {
@@ -174,9 +174,9 @@ if ($ApimName -and $RgName) {
 # =============================================================================
 Write-Info 'Test 5: Verifying Cosmos DB...'
 if ($RgName) {
-    $CosmosName = (az cosmosdb list --resource-group $RgName --query "[0].name" -o tsv 2>$null)
+    $CosmosName = (az cosmosdb list --resource-group $RgName --query "[0].name" --output tsv 2>$null)
     if ($CosmosName) {
-        $CosmosState = Invoke-AzRetry cosmosdb show --name $CosmosName --resource-group $RgName --query "provisioningState" -o tsv
+        $CosmosState = Invoke-AzRetry cosmosdb show --name $CosmosName --resource-group $RgName --query "provisioningState" --output tsv
         if ($CosmosState -eq 'Succeeded') {
             Write-Pass "Cosmos DB '$CosmosName' is online"
         }
@@ -194,9 +194,9 @@ if ($RgName) {
 # =============================================================================
 Write-Info 'Test 6: Verifying Event Hub namespace...'
 if ($RgName) {
-    $Evhns = (az eventhubs namespace list --resource-group $RgName --query "[0].name" -o tsv 2>$null)
+    $Evhns = (az eventhubs namespace list --resource-group $RgName --query "[0].name" --output tsv 2>$null)
     if ($Evhns) {
-        $EvhnsState = Invoke-AzRetry eventhubs namespace show --name $Evhns --resource-group $RgName --query "provisioningState" -o tsv
+        $EvhnsState = Invoke-AzRetry eventhubs namespace show --name $Evhns --resource-group $RgName --query "provisioningState" --output tsv
         if ($EvhnsState -eq 'Succeeded') {
             Write-Pass "Event Hub namespace '$Evhns' is active"
         }
@@ -214,9 +214,9 @@ if ($RgName) {
 # =============================================================================
 Write-Info 'Test 7: Verifying Key Vault...'
 if ($RgName) {
-    $KvName = (az keyvault list --resource-group $RgName --query "[0].name" -o tsv 2>$null)
+    $KvName = (az keyvault list --resource-group $RgName --query "[0].name" --output tsv 2>$null)
     if ($KvName) {
-        $KvState = Invoke-AzRetry keyvault show --name $KvName --query "properties.provisioningState" -o tsv
+        $KvState = Invoke-AzRetry keyvault show --name $KvName --query "properties.provisioningState" --output tsv
         if ($KvState -eq 'Succeeded') {
             Write-Pass "Key Vault '$KvName' is accessible"
         }
@@ -234,7 +234,7 @@ if ($RgName) {
 # =============================================================================
 Write-Info 'Test 8: Verifying managed identity on APIM...'
 if ($ApimName -and $RgName) {
-    $IdentityType = (az apim show --name $ApimName --resource-group $RgName --query "identity.type" -o tsv 2>$null)
+    $IdentityType = (az apim show --name $ApimName --resource-group $RgName --query "identity.type" --output tsv 2>$null)
     if ($IdentityType -like '*UserAssigned*') {
         Write-Pass 'APIM has UserAssigned managed identity'
     }
@@ -249,14 +249,14 @@ if ($ApimName -and $RgName) {
 Write-Info 'Test 9: APIM API endpoint smoke tests (real HTTP calls)...'
 if ($ApimName -and $RgName -and $ApimUrl) {
     # Fetch the APIM master subscription primary key via ARM REST.
-    $CurrentSub = (az account show --query id -o tsv 2>$null)
+    $CurrentSub = (az account show --query id --output tsv 2>$null)
     if (-not $CurrentSub) { $CurrentSub = '' }
     $ApimKey = ''
     if ($CurrentSub) {
         $KeyUrl = "https://management.azure.com/subscriptions/$CurrentSub/resourceGroups/$RgName/providers/Microsoft.ApiManagement/service/$ApimName/subscriptions/master/listSecrets?api-version=2022-08-01"
         # Retry up to 3x — first call sometimes flakes during token refresh.
         for ($attempt = 1; $attempt -le 3; $attempt++) {
-            $ApimKey = (az rest --method post --url $KeyUrl --query primaryKey -o tsv 2>$null)
+            $ApimKey = (az rest --method post --url $KeyUrl --query primaryKey --output tsv 2>$null)
             if (-not $ApimKey) { $ApimKey = '' }
             if ($ApimKey) { break }
             Start-Sleep -Seconds 2
@@ -271,7 +271,7 @@ if ($ApimName -and $RgName -and $ApimUrl) {
     }
 
     # List deployed APIs and their gateway paths.
-    $ApisTsv = (az apim api list --resource-group $RgName --service-name $ApimName --query "[].{name:name, path:path}" -o tsv 2>$null)
+    $ApisTsv = (az apim api list --resource-group $RgName --service-name $ApimName --query "[].{name:name, path:path}" --output tsv 2>$null)
     if (-not $ApisTsv) { $ApisTsv = '' }
 
     if (-not $ApisTsv) {

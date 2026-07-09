@@ -202,9 +202,9 @@ resource "azurerm_route_table" "apim" {
   tags                = var.tags
 
   route {
-    name                   = "apim-management"
-    address_prefix         = "ApiManagement"
-    next_hop_type          = "Internet"
+    name           = "apim-management"
+    address_prefix = "ApiManagement"
+    next_hop_type  = "Internet"
   }
 }
 
@@ -218,7 +218,7 @@ resource "azurerm_subnet" "apim" {
   resource_group_name  = var.resource_group_name
   virtual_network_name = azurerm_virtual_network.citadel[0].name
   address_prefixes     = [var.apim_subnet_prefix]
-  service_endpoints = ["Microsoft.CognitiveServices"]
+  service_endpoints    = ["Microsoft.CognitiveServices"]
 }
 
 resource "azurerm_subnet_network_security_group_association" "apim" {
@@ -239,7 +239,7 @@ resource "azurerm_subnet" "pe" {
   resource_group_name  = var.resource_group_name
   virtual_network_name = azurerm_virtual_network.citadel[0].name
   address_prefixes     = [var.pe_subnet_prefix]
-  service_endpoints = ["Microsoft.CognitiveServices"]
+  service_endpoints    = ["Microsoft.CognitiveServices"]
 }
 
 resource "azurerm_subnet" "logic_app" {
@@ -248,7 +248,7 @@ resource "azurerm_subnet" "logic_app" {
   resource_group_name  = var.resource_group_name
   virtual_network_name = azurerm_virtual_network.citadel[0].name
   address_prefixes     = [var.logic_app_subnet_prefix]
-  service_endpoints = ["Microsoft.CognitiveServices"]
+  service_endpoints    = ["Microsoft.CognitiveServices"]
 
   delegation {
     name = "delegation-web"
@@ -327,8 +327,20 @@ resource "azurerm_private_dns_zone" "zones" {
   tags                = var.tags
 }
 
+# Zones to link to the VNet. The Azure Monitor private-link zone
+# (privatelink.monitor.azure.com) is created above (AMPLS references it when
+# enabled) but must ONLY be VNet-linked when AMPLS is actually deployed and
+# populates it with private-endpoint records. Linking an empty monitor zone
+# resolves App Insights / Azure Monitor ingestion endpoints to a dead private
+# zone from inside the VNet, blackholing all App Insights telemetry.
+locals {
+  linked_zone_names = var.use_azure_monitor_private_link_scope ? local.dns_zone_names : {
+    for k, v in local.dns_zone_names : k => v if k != "monitor"
+  }
+}
+
 resource "azurerm_private_dns_zone_virtual_network_link" "links" {
-  for_each              = var.create_dns_zones ? local.dns_zone_names : {}
+  for_each              = var.create_dns_zones ? local.linked_zone_names : {}
   name                  = "link-${each.key}"
   resource_group_name   = var.resource_group_name
   private_dns_zone_name = azurerm_private_dns_zone.zones[each.key].name
