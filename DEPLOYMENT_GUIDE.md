@@ -6,7 +6,7 @@
 > scenario.
 >
 > **Related files:**
-> [scripts/deploy.sh](scripts/deploy.sh) ·
+> [scripts/deploy.sh](scripts/deploy.sh) / [scripts/deploy.ps1](scripts/deploy.ps1) ·
 > [environments/dev.tfvars](environments/dev.tfvars) ·
 > [environments/prod.tfvars](environments/prod.tfvars)
 
@@ -60,6 +60,47 @@ Sign in before anything else:
 az login
 az account set --subscription "<your-subscription-id>"
 ```
+
+### 2.1 Script flavors: Bash & PowerShell
+
+Every helper in [scripts/](scripts/) ships in **two interchangeable flavors** —
+Bash (`*.sh`) and PowerShell 7+ (`*.ps1`). Both drive the same Terraform graph;
+pick whichever suits your shell. This guide's examples use the Bash form, but
+every `./scripts/*.sh` command has a `./scripts/*.ps1` equivalent. The only
+difference is flag syntax: Bash uses `--kebab-case` flags, PowerShell uses
+`-PascalCase` switches.
+
+| Bash (`deploy.sh`) | PowerShell (`deploy.ps1`) |
+|---|---|
+| `dev` / `prod` (positional) | `dev` / `prod` (positional) |
+| `--auto-approve` | `-AutoApprove` |
+| `--phased` | `-Phased` |
+| `--with-entra` | `-WithEntra` |
+| `--with-foundry-conn` | `-WithFoundryConn` |
+| `--with-access-contracts` | `-WithAccessContracts` |
+| `--with-mcp-samples` | `-WithMcpSamples` |
+| `--with-jwt` | `-WithJwt` |
+| `--with-apic-onboarding` | `-WithApicOnboarding` |
+| `--all-addons` | `-AllAddons` |
+| `--skip-logic-app-code` | `-SkipLogicAppCode` |
+| `--logic-app-code-only` | `-LogicAppCodeOnly` |
+| `--help` | `-Help` |
+
+**Example (identical result):**
+
+```bash
+./scripts/deploy.sh prod --all-addons --phased --auto-approve
+```
+
+```powershell
+./scripts/deploy.ps1 prod -AllAddons -Phased -AutoApprove
+```
+
+The same mapping applies to the other helpers:
+[bootstrap-state](scripts/bootstrap-state.ps1),
+[validate](scripts/validate.ps1), [destroy](scripts/destroy.ps1), and
+[import-existing](scripts/import-existing.ps1) all expose `.ps1` equivalents
+with positional `dev`/`prod` arguments.
 
 ---
 
@@ -762,6 +803,44 @@ For a hard reset set the var to `true` in your tfvars and re-run destroy.
 
 # Notebook test suite (against a live deployment)
 pip install -r shared/requirements.txt   # then run validation/*.ipynb
+```
+
+### PowerShell equivalents
+
+Every command above has a PowerShell twin (see §2.1 for the full flag map):
+
+```powershell
+# Help
+./scripts/deploy.ps1 -Help
+
+# Core only
+./scripts/deploy.ps1 dev
+./scripts/deploy.ps1 prod -AutoApprove
+
+# Individual add-ons
+./scripts/deploy.ps1 dev -WithEntra
+./scripts/deploy.ps1 dev -WithFoundryConn
+./scripts/deploy.ps1 dev -WithAccessContracts
+./scripts/deploy.ps1 dev -WithMcpSamples
+./scripts/deploy.ps1 dev -WithApicOnboarding
+./scripts/deploy.ps1 dev -WithJwt
+
+# Combinations
+./scripts/deploy.ps1 dev -WithEntra -WithFoundryConn
+./scripts/deploy.ps1 prod -AllAddons
+
+# Phased rollout
+./scripts/deploy.ps1 prod -Phased
+./scripts/deploy.ps1 prod -AllAddons -Phased
+./scripts/deploy.ps1 prod -WithEntra -WithFoundryConn -Phased
+
+# Logic App workflow code
+./scripts/deploy.ps1 dev -SkipLogicAppCode     # infra only
+./scripts/deploy.ps1 dev -LogicAppCodeOnly     # republish workflows only
+
+# Validation + teardown
+./scripts/validate.ps1 dev
+./scripts/destroy.ps1 dev
 ```
 
 ---

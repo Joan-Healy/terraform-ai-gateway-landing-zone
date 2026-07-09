@@ -50,7 +50,8 @@ Complete Terraform implementation of the [Azure AI Citadel Governance Hub](https
 | Terraform | ≥ 1.5 | [Install](https://developer.hashicorp.com/terraform/install) |
 | Azure CLI | ≥ 2.50 | [Install](https://aka.ms/installazurecli) |
 | Git | Any | [Install](https://git-scm.com) |
-| Bash shell | Any | macOS/Linux: built-in. Windows: use [Git Bash](https://git-scm.com) or [WSL](https://learn.microsoft.com/windows/wsl/install) to run the `scripts/*.sh` helpers. |
+| Bash shell (`scripts/*.sh`) | Any | macOS/Linux: built-in. Windows: use [Git Bash](https://git-scm.com) or [WSL](https://learn.microsoft.com/windows/wsl/install). |
+| PowerShell (`scripts/*.ps1`) | 7+ | Cross-platform on macOS/Linux/Windows — [Install pwsh](https://learn.microsoft.com/powershell/scripting/install/installing-powershell). |
 
 ### 1 — Clone and configure
 
@@ -63,8 +64,16 @@ cd citadel-terraform
 ### 2 — (Optional) Set up remote state backend
 
 ```bash
+# Bash (Linux/macOS):
+# -------------------
 ./scripts/bootstrap-state.sh eastus
 # Then uncomment the backend block in versions.tf and re-run terraform init
+```
+
+```powershell
+# PowerShell (cross-platform pwsh):
+# --------------------------------
+./scripts/bootstrap-state.ps1 eastus
 ```
 
 ### 3 — Deploy
@@ -75,6 +84,8 @@ cp environments/dev.tfvars.example environments/dev.tfvars
 # Edit environments/dev.tfvars — set subscription_id and other required values
 # (for production: cp environments/prod.tfvars.example environments/prod.tfvars)
 
+# Bash (Linux/macOS):
+# -------------------
 # Development environment (30-45 min for APIM)
 ./scripts/deploy.sh dev
 
@@ -85,16 +96,38 @@ cp environments/dev.tfvars.example environments/dev.tfvars
 ./scripts/deploy.sh dev --auto-approve
 ```
 
+```powershell
+# PowerShell (cross-platform pwsh):
+# ---------------------------------
+./scripts/deploy.ps1 dev
+./scripts/deploy.ps1 prod
+
+# Skip confirmation prompt
+./scripts/deploy.ps1 dev -AutoApprove
+```
+
 ### 4 — Validate
 
 ```bash
+# Bash
 ./scripts/validate.sh dev
+```
+
+```powershell
+# PowerShell
+./scripts/validate.ps1 dev
 ```
 
 ### 5 — Tear down
 
 ```bash
+# Bash
 ./scripts/destroy.sh dev
+```
+
+```powershell
+# PowerShell
+./scripts/destroy.ps1 dev
 ```
 
 ---
@@ -314,14 +347,14 @@ service object and Foundry connection options.
 
 ## 📋 Post-Deployment Checklist
 
-- [ ] Run `./scripts/validate.sh <env>` — all checks pass
+- [ ] Run `./scripts/validate.sh <env>` (or `./scripts/validate.ps1 <env>`) — all checks pass
 - [ ] Retrieve APIM subscription key from Azure Portal → APIM → Subscriptions
 - [ ] Test `POST /models/chat/completions` with a sample request
 - [ ] Load `model-pricing.json` into Cosmos DB `model-pricing` container
 - [ ] Connect Power BI desktop to Cosmos DB endpoint
 - [ ] For production: disable Event Hub public access post-deploy
 - [ ] For production: configure APIM custom domains + TLS certificates
-- [ ] Configure CI/CD pipeline to call `./scripts/deploy.sh prod --auto-approve`
+- [ ] Configure CI/CD pipeline to call `./scripts/deploy.sh prod --auto-approve` (or `./scripts/deploy.ps1 prod -AutoApprove`)
 
 ---
 
@@ -383,11 +416,12 @@ citadel-terraform/
 │   ├── prod.tfvars.example  # Production template — copy to prod.tfvars and fill in
 │   └── prod.tfvars          # Production (PremiumV2, fully private)
 │
-├── scripts/
-│   ├── deploy.sh            # Full deploy script (init + plan + apply)
-│   ├── destroy.sh           # Teardown script
-│   ├── validate.sh          # Post-deployment smoke tests
-│   └── bootstrap-state.sh   # One-time remote state backend setup
+├── scripts/                # Bash (*.sh) + PowerShell (*.ps1) equivalents
+│   ├── deploy.sh / .ps1        # Full deploy script (init + plan + apply)
+│   ├── destroy.sh / .ps1       # Teardown script
+│   ├── validate.sh / .ps1      # Post-deployment smoke tests
+│   ├── import-existing.sh / .ps1  # Import pre-existing resources into state
+│   └── bootstrap-state.sh / .ps1  # One-time remote state backend setup
 │
 ├── shared/                  # Python helpers for the validation notebooks
 │   ├── utils.py             # Config bootstrap (+ Terraform-output bridge), APIM helpers
