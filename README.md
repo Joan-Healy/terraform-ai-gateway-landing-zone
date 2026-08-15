@@ -1,6 +1,6 @@
-# 🏰 AI Citadel Governance Hub — Terraform
+# 🏰 AI Gateway Landing Zone — Terraform
 
-Complete Terraform implementation of the [Azure AI Citadel Governance Hub](https://github.com/Azure-Samples/ai-hub-gateway-solution-accelerator/tree/citadel-v1) solution accelerator. Mirrors the Bicep reference architecture using Terraform + AzureRM + AzAPI providers.
+Complete Terraform implementation of the [AI Gateway Landing Zone - Bicep](https://github.com/Azure-Samples/ai-hub-gateway-solution-accelerator/tree/citadel-v1) solution accelerator. Mirrors the Bicep reference architecture using Terraform + AzureRM + AzAPI providers.
 
 ---
 
