@@ -8,7 +8,7 @@ permissions:
   contents: read
 
 jobs:
-  terraform:
+  deploy:
     runs-on: ubuntu-latest
 
     steps:
@@ -21,16 +21,13 @@ jobs:
           tenant-id: ${{ vars.AZURE_TENANT_ID }}
           subscription-id: ${{ vars.AZURE_SUBSCRIPTION_ID }}
 
-      - uses: hashicorp/setup-terraform@v3
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
 
-      - name: Terraform Init
-        run: terraform init
+      - name: Make scripts executable
+        run: |
+          chmod +x scripts/*.sh
 
-      - name: Terraform Validate
-        run: terraform validate
-
-      - name: Terraform Plan
-        run: terraform plan -var-file=environments/dev.tfvars
-
-      - name: Terraform Apply
-        run: terraform apply -auto-approve -var-file=environments/dev.tfvars
+      - name: Deploy Citadel
+        run: |
+          ./scripts/deploy.sh dev --auto-approve --phased
