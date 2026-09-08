@@ -27,7 +27,7 @@ tags = {
 # 2. RESOURCE NAMING (blank = auto-generated)
 # -----------------------------------------------------------------------------
 resource_group_name         = "rg-citadel-tf-dev-01"
-use_existing_resource_group = false
+use_existing_resource_group = true
 # apim_service_name         = ""
 # cosmos_db_account_name    = ""
 # eventhub_namespace_name   = ""
