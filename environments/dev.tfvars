@@ -125,12 +125,12 @@ entra_auth_enabled = false
 # -----------------------------------------------------------------------------
 # 10. AI FOUNDRY
 # -----------------------------------------------------------------------------
-foundry_network_injection_enabled = true
+foundry_network_injection_enabled = false
 ai_foundry_instances = [
   {
     location                  = "swedencentral"
     default_project_name      = "citadel-dev-project"
-    network_injection_enabled = true
+    network_injection_enabled = false
   }
 ]
 
