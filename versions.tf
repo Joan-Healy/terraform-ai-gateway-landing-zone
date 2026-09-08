@@ -47,4 +47,11 @@ terraform {
   #   container_name       = "citadel-tfstate"
   #   key                  = "citadel.terraform.tfstate"
   # }
+
+  backend "azurerm" {
+    resource_group_name  = "rg-terraform-state-citadel"
+    storage_account_name = "stcitadelstate1788866209404"
+    container_name       = "citadel-tfstate"
+    key                  = "citadel.terraform.tfstate"
+  }
 }
