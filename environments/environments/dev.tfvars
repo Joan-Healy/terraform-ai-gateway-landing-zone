@@ -237,12 +237,12 @@ logic_app_code_source_path  = "logicapp-src/usage-ingestion-logicapp" # blank â†
 # -----------------------------------------------------------------------------
 configure_circuit_breaker = true
 enable_pii_anonymization  = true
-ms_learn_mcp_backend_url  = "https://learn.microsoft.com/api/mcp"
+ms_learn_mcp_backend_url = "https://learn.microsoft.com/api/mcp"
 enable_jwt_auth           = false
 jwt_tenant_id             = ""
 jwt_app_registration_id   = ""
 pii_service_key           = "replace-with-language-service-key-if-needed"
-azure_login_endpoint      = "https://login.microsoftonline.com/"
+azure_login_endpoint = "https://login.microsoftonline.com/"
 
 # -----------------------------------------------------------------------------
 # 21. ENTRA ID ADD-ON (app registration)
