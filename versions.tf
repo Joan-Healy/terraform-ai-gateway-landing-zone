@@ -41,17 +41,17 @@ terraform {
   }
 
   # Uncomment for remote state (recommended for team environments)
-  # backend "azurerm" {
-  #   resource_group_name  = "rg-terraform-state"
-  #   storage_account_name = "stterraformstate"
-  #   container_name       = "citadel-tfstate"
-  #   key                  = "citadel.terraform.tfstate"
-  # }
-
   backend "azurerm" {
-    resource_group_name  = "rg-terraform-state-citadel"
-    storage_account_name = "stcitadelstate"
+    resource_group_name  = "rg-terraform-state"
+    storage_account_name = "stterraformstate"
     container_name       = "citadel-tfstate"
     key                  = "citadel.terraform.tfstate"
   }
+
+  #backend "azurerm" {
+  #  resource_group_name  = "rg-terraform-state-citadel"
+  #  storage_account_name = "stcitadelstate"
+  #  container_name       = "citadel-tfstate"
+  #  key                  = "citadel.terraform.tfstate"
+  #}
 }
